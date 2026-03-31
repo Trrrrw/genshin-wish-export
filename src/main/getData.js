@@ -125,11 +125,11 @@ const detectGameType = async (userPath) => {
   try {
     await fs.access(path.join(userPath, '/AppData/LocalLow/miHoYo/', '原神/output_log.txt'), fs.constants.F_OK)
     list.push('原神')
-  } catch (e) {}
+  } catch (e) { }
   try {
     await fs.access(path.join(userPath, '/AppData/LocalLow/miHoYo/', 'Genshin Impact/output_log.txt'), fs.constants.F_OK)
     list.push('Genshin Impact')
-  } catch (e) {}
+  } catch (e) { }
   if (config.logType) {
     if (config.logType === 2) {
       list.reverse()
@@ -143,7 +143,7 @@ const detectGameType = async (userPath) => {
   try {
     await fs.access(path.join(userPath, '/AppData/Local/', 'miHoYo/GenshinImpactCloudGame/config/logs/MiHoYoSDK.log'), fs.constants.F_OK)
     list.push('cloud')
-  } catch (e) {}
+  } catch (e) { }
   return list
 }
 
@@ -246,7 +246,7 @@ const getGachaLogs = async ([key, name], queryString) => {
       endId = BigInt(res[res.length - 1].id)
     }
 
-    if (!config.fetchFullHistory && res.length && uid && dataMap.has(uid)) {
+    if (!config.fetchFullHistory && config.ugc_rewrited && res.length && uid && dataMap.has(uid)) {
       const result = dataMap.get(uid).result
       if (result.has(key)) {
         const arr = result.get(key)
@@ -267,6 +267,10 @@ const getGachaLogs = async ([key, name], queryString) => {
       }
     }
   } while (res.length > 0)
+  if (!(!config.fetchFullHistory && config.ugc_rewrited)) {
+    config.ugc_rewrited = true
+    config.save()
+  }
   return { list, uid }
 }
 
@@ -295,7 +299,7 @@ const tryGetUid = async (queryString) => {
         return res.data.list[0].uid
       }
     }
-  } catch (e) {}
+  } catch (e) { }
   return config.current
 }
 
@@ -418,7 +422,7 @@ const fetchData = async (urlOverride) => {
   for (const type of gachaType) {
     const { list, uid } = await getGachaLogs(type, queryString)
     const logs = list.map((item) => {
-      return [item.time, item.name??item.item_name, item.item_type, parseInt(item.rank_type), item.gacha_type??item.op_gacha_type, item.id]
+      return [item.time, item.name ?? item.item_name, item.item_type, parseInt(item.rank_type), item.gacha_type ?? item.op_gacha_type, item.id, item.schedule_id ?? "", item.item_id]
     })
     logs.reverse()
     typeMap.set(type[0], type[1])

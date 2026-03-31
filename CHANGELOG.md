@@ -19,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [0.12.4] - 2026-04-01
+<p color="red">⚠️本次更新软件后第一次更新数据会自动执行“获取完整数据”⚠️</p>
+
+### Changed
+
+- Changed export format to UIGFv4.2.
+
 ## [0.12.3] - 2025-12-23
 
 ### Fixed

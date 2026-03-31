@@ -35,7 +35,7 @@ const getTimeString = () => {
 
 const formatDate = (date) => {
   let y = date.getFullYear()
-  let m = `${date.getMonth()+1}`.padStart(2, '0')
+  let m = `${date.getMonth() + 1}`.padStart(2, '0')
   let d = `${date.getDate()}`.padStart(2, '0')
   return `${y}-${m}-${d} ${date.toLocaleString('zh-cn', { hour12: false }).slice(-8)}`
 }
@@ -197,12 +197,92 @@ const uigfJson = async () => {
   return result
 }
 
+const uigf4_2Json = async () => {
+  const { dataMap, current } = getData()
+  const data = dataMap.get(current)
+  if (!data?.result.size) {
+    throw new Error('数据为空')
+  }
+  const fakeId = fakeIdFn()
+  const result = {
+    info: {
+      export_timestamp: Math.round(Date.now() / 1000),
+      export_app: 'genshin-wish-export',
+      export_app_version: `v${version}`,
+      uigf_version: 'v4.2',
+    },
+    hk4e: [{
+      uid: data.uid,
+      timezone: data.uid.startsWith('6') ? -5 : data.uid.startsWith('7') ? 1 : 8,
+      lang: data.lang,
+      list: []
+    }],
+    hk4e_ugc: [{
+      uid: data.uid,
+      timezone: data.uid.startsWith('6') ? -5 : data.uid.startsWith('7') ? 1 : 8,
+      lang: data.lang,
+      list: []
+    }]
+  }
+  const listHk4eTemp = []
+  const listHk4eUgcTemp = []
+  const uigfLang = uigfLangMap.get(data.lang) || uigfLangMap.get(fixLocalMap.get(data.lang))
+  for (let [type, arr] of data.result) {
+    if (type == '1000' || type == '2000') {
+      for (let item of arr) {
+        listHk4eUgcTemp.push({
+          id: item[5],
+          schedule_id: item[6],
+          op_gacha_type: shouldBeString(item[4]) || type,
+          item_id: item[7],
+          time: item[0],
+          item_name: item[1],
+          item_type: item[2],
+          rank_type: `${item[3]}`,
+        })
+      }
+      continue
+    }
+    for (let item of arr) {
+      listHk4eTemp.push({
+        uigf_gacha_type: type,
+        gacha_type: shouldBeString(item[4]) || type,
+        item_id: await getItemId(uigfLang, item[1]),
+        count: "1",
+        time: item[0],
+        name: item[1],
+        item_type: item[2],
+        rank_type: `${item[3]}`,
+        id: shouldBeString(item[5]) || '',
+      })
+    }
+  }
+  listHk4eTemp.sort((a, b) => a.timestamp - b.timestamp)
+  listHk4eTemp.forEach(item => {
+    delete item.timestamp
+    result.hk4e[0].list.push({
+      ...item,
+      id: item.id || fakeId()
+    })
+  })
+  listHk4eUgcTemp.sort((a, b) => a.timestamp - b.timestamp)
+  listHk4eUgcTemp.forEach(item => {
+    delete item.timestamp
+    result.hk4e_ugc[0].list.push({
+      ...item,
+      id: item.id || fakeId()
+    })
+  })
+  return result
+}
+
 const start = async () => {
   await initLookupTable()
-  const result = await uigfJson()
+  // const result = await uigfJson()
+  const result = await uigf4_2Json()
   await saveLookupTable()
   const filePath = dialog.showSaveDialogSync({
-    defaultPath: path.join(app.getPath('downloads'), `UIGF_${result.info.uid}_${getTimeString()}`),
+    defaultPath: path.join(app.getPath('downloads'), `UIGF_${result.hk4e[0].uid}_${getTimeString()}`),
     filters: [
       { name: 'JSON', extensions: ['json'] }
     ]
@@ -274,4 +354,4 @@ ipcMain.handle('IMPORT_UIGF_JSON', async () => {
   return await importJson()
 })
 
-module.exports = { uigfJson }
+module.exports = { uigfJson, uigf4_2Json }
