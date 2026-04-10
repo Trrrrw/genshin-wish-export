@@ -209,7 +209,7 @@ const uigf4_2Json = async () => {
       export_timestamp: Math.round(Date.now() / 1000),
       export_app: 'genshin-wish-export',
       export_app_version: `v${version}`,
-      uigf_version: 'v4.2',
+      version: 'v4.2',
     },
     hk4e: [{
       uid: data.uid,
