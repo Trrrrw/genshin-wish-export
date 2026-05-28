@@ -24,6 +24,15 @@
         <div class="flex space-x-2">
           <el-button :loading="data.loadingOfUIGFJSON" class="focus:outline-none" plain type="primary" @click="importUIGFJSON">{{ text.UIGFImportButton }}</el-button>
           <el-button :loading="data.loadingOfUIGFJSON" class="focus:outline-none" plain type="success" @click="exportUIGFJSON">{{ text.UIGFButton }}</el-button>
+          <el-select class="w-24" v-model="settingForm.uigfVersion">
+            <el-option
+              v-for="version in uigfSupportedVersions"
+              :key="version"
+              :label="'UIGFv' + version"
+              :value="version"
+            />
+          </el-select>
+          <el-checkbox v-if="settingForm.uigfVersion === uigfSupportedVersions[0]" v-model="settingForm.uigfAllAccounts">{{ text.UIGFAllAccounts }}</el-checkbox>
           <el-checkbox v-model="settingForm.readableJSON" @change="saveSetting">{{ text.UIGFReadable }}</el-checkbox>
         </div>
         <p class="text-gray-400 text-xs m-1.5 leading-normal">{{ text.UIGFHint }}
@@ -88,8 +97,16 @@ const settingForm = reactive({
   hideNovice: true,
   hideMiliastra: false,
   gistsToken: '',
+  uigfVersion: "4.2",
+  uigfAllAccounts: true,
   readableJSON: false
 })
+
+const uigfSupportedVersions = [
+  "4.2",
+  "4.1",
+  "3.0"
+]
 
 const text = computed(() => props.i18n.ui.setting)
 const about = computed(() => props.i18n.ui.about)
@@ -118,7 +135,7 @@ const openLink = (link) => shell.openExternal(link)
 const exportUIGFJSON = async () => {
   data.loadingOfUIGFJSON = true
   try {
-    await ipcRenderer.invoke('EXPORT_UIGF_JSON')
+    await ipcRenderer.invoke('EXPORT_UIGF_JSON', settingForm.uigfVersion, settingForm.uigfAllAccounts)
   } catch (e) {
     ElMessage({
       message: e.message || e,

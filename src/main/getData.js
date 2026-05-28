@@ -420,6 +420,7 @@ const fetchData = async (urlOverride) => {
   const gachaType = getItemTypeNameMap(lang)
   let originUid = 0
   for (const type of gachaType) {
+    if (config.hideMiliastra && (type[0] == '1000' || type[0] == '2000')) continue
     const { list, uid } = await getGachaLogs(type, queryString)
     const logs = list.map((item) => {
       return [item.time, item.name ?? item.item_name, item.item_type, parseInt(item.rank_type), item.gacha_type ?? item.op_gacha_type, item.id, item.schedule_id ?? "", item.item_id]
@@ -482,8 +483,8 @@ ipcMain.handle('FORCE_READ_DATA', async () => {
   }
 })
 
-ipcMain.handle('CHANGE_UID', (event, uid) => {
-  config.current = uid
+ipcMain.handle('CHANGE_UID', async (event, uid) => {
+  await changeCurrent(uid)
 })
 
 ipcMain.handle('GET_CONFIG', () => {

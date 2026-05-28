@@ -19,6 +19,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [0.12.6] - 2026-05-28
+
+### Added
+
+- Added Chinese translation for the "Hide Miliastra Wonderland" setting.
+- Added UIGF v4.2 import.
+
+### Changed
+
+- "Hide miliastra wonderland" setting now takes effect during data fetch, skipping Miliastra
+Wonderland gacha types (1000/2000) when enabled.
+- Merged upstream updates from
+[biuuu/genshin-wish-export](https://github.com/biuuu/genshin-wish-export).
+
 ## [0.12.5] - 2026-04-10
 ### Fixed
 
