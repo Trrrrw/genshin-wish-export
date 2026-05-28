@@ -80,7 +80,10 @@ Wonderland gacha types (1000/2000) when enabled.
 - Added adaptation for Simplified Chinese Miliastra Wonderland ([biuuu/genshin-wish-export#292](https://github.com/biuuu/genshin-wish-export/issues/292)).
 
 
-[unreleased]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.3...HEAD
+[unreleased]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.6...HEAD
+[0.12.6]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.5...v0.12.6
+[0.12.5]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.4...v0.12.5
+[0.12.4]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/Trrrrw/genshin-wish-export/compare/v0.12.0...v0.12.1
