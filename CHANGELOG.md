@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
+## [0.12.7] - 2026-05-29
+<p color="red">⚠️本次更新软件后建议重新获取完整数据⚠️</p>
+
+### Fixed
+
+- Fixed UIGF v4.2 export missing `schedule_id` and `item_id` fields in hk4e_ugc.
+- Fixed import crash when UIGF v4.2 file has no `hk4e` or `hk4e_ugc` field.
+- Fixed `saveAndBackup` uid type inconsistency by converting to string.
+
 ## [0.12.6] - 2026-05-28
 
 ### Added

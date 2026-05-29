@@ -316,7 +316,9 @@ const generateUigf42Json = async (uigfAllAccounts = true) => {
         if (gachaType == '1000' || gachaType == '2000') {
           const gachaItem = {
             id: shouldBeString(gacha[5]) || '',
+            schedule_id: gacha[6] || '',
             op_gacha_type: shouldBeString(gacha[4]) || gachaType,
+            item_id: gacha[7] || '',
             time: gacha[0],
             item_name: gacha[1],
             item_type: gacha[2],
@@ -392,6 +394,7 @@ const start = async (uigfVersion, uigfAllAccounts=true) => {
 }
 
 const saveAndBackup = async (data) => {
+  data.uid = String(data.uid)
   if (existsFile(`gacha-list-${data.uid}.json`)) {
     const backupDir = path.join(userDataPath, 'backup', data.uid)
     await fs.ensureDir(backupDir)
@@ -453,7 +456,7 @@ const importUgif41Json = async (importData) => {
 const importUgif42Json = async (importData) => {
   const accountsMap = new Map()
 
-  for (const accountData of importData.hk4e) {
+  for (const accountData of importData.hk4e ?? []) {
       const gachaData = {
         result: new Map(),
         time: Date.now(),
@@ -476,9 +479,19 @@ const importUgif42Json = async (importData) => {
       }
       accountsMap.set(accountData.uid, gachaData)
   }
-  for (const accountData of importData.hk4e_ugc) {
-      const gachaData = accountsMap.get(accountData.uid)
-      if (!gachaData) continue
+  for (const accountData of importData.hk4e_ugc ?? []) {
+      let gachaData = accountsMap.get(accountData.uid)
+      if (!gachaData) {
+        gachaData = {
+          result: new Map(),
+          time: Date.now(),
+          typeMap: getItemTypeNameMap(accountData.lang),
+          uid: accountData.uid,
+          lang: accountData.lang
+        }
+        gachaData.typeMap.forEach((_, k) => gachaData.result.set(k, []))
+      }
+      accountData.list.sort((itemA, itemB) => parseInt(BigInt(itemA.id) - BigInt(itemB.id)))
       for (const item of accountData.list) {
         const gachaItem = [
           item.time,
@@ -486,7 +499,9 @@ const importUgif42Json = async (importData) => {
           item.item_type,
           parseInt(item.rank_type),
           item.op_gacha_type,
-          item.id
+          item.id,
+          item.schedule_id,
+          item.item_id,
         ]
         if (item.op_gacha_type == '1000'){
           gachaData.result.get(item.op_gacha_type).push(gachaItem)
@@ -494,9 +509,10 @@ const importUgif42Json = async (importData) => {
           gachaData.result.get('2000').push(gachaItem)
         }
       }
-      for (const gachaData of accountsMap.values()) {
-        await saveAndBackup(gachaData)
-      }
+      accountsMap.set(accountData.uid, gachaData)
+  }
+  for (const accountData of accountsMap.values()) {
+    await saveAndBackup(accountData)
   }
 }
 
